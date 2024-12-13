@@ -1,0 +1,25 @@
+{
+	"version": 1,
+	"flameworkVersion": "1.2.3",
+	"identifiers": {
+		"towerdefenseproject:out/Client/Data/init@ClientData": "Client/Data/init@ClientData",
+		"towerdefenseproject:out/Client/InputManager/init@InputManager": "Client/InputManager/init@InputManager",
+		"towerdefenseproject:out/Client/Placement/Placement@Placement": "Client/Placement/Placement@Placement",
+		"towerdefenseproject:out/Server/Modules/DataService/init@DataService": "Server/Modules/DataService/init@DataService",
+		"towerdefenseproject:out/Shared/Enemy/init@Enemy": "Shared/Enemy/init@Enemy",
+		"towerdefenseproject:out/Shared/CoreLibs/Networking@GlobalEvents": "Shared/CoreLibs/Networking@GlobalEvents",
+		"towerdefenseproject:out/Shared/CoreLibs/Networking@GlobalFunctions": "Shared/CoreLibs/Networking@GlobalFunctions",
+		"towerdefenseproject:out/Client/Modules/Data/init@ClientData": "Client/Modules/Data/init@ClientData",
+		"towerdefenseproject:out/Client/Modules/InputManager/init@InputManager": "Client/Modules/InputManager/init@InputManager",
+		"towerdefenseproject:out/Shared/Enemy/Enemy@Enemy": "Shared/Enemy/Enemy@Enemy",
+		"towerdefenseproject:out/Server/Modules/Enemy@Enemy": "Server/Modules/Enemy@Enemy",
+		"towerdefenseproject:out/Client/Modules/Enemy@Enemy": "Client/Modules/Enemy@Enemy",
+		"towerdefenseproject:out/Client/Modules/ClientEnemy@Enemy": "Client/Modules/ClientEnemy@Enemy",
+		"towerdefenseproject:out/Client/Modules/ClientEnemy@ClientEnemy": "Client/Modules/ClientEnemy@ClientEnemy",
+		"towerdefenseproject:out/Client/Modules/ClientEnemy@$p:error": "Client/Modules/ClientEnemy@$p:error",
+		"towerdefenseproject:out/Client/Modules/Entities/ClientEnemy@ClientEnemy": "Client/Modules/Entities/ClientEnemy@ClientEnemy",
+		"towerdefenseproject:out/Server/Modules/Entities/Enemy@Enemy": "Server/Modules/Entities/Enemy@Enemy",
+		"towerdefenseproject:out/Client/Modules/Entities/ClientTower/RangeDisplay@TowerRangeDisplay": "Client/Modules/Entities/ClientTower/RangeDisplay@TowerRangeDisplay"
+	},
+	"metadata": {}
+}
