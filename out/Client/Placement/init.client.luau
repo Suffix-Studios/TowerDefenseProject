@@ -1,8 +1,8 @@
 -- Compiled with roblox-ts v3.0.0
 local TS = require(game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("RuntimeLib"))
 local ClientData = TS.import(script, game:GetService("ReplicatedStorage"), "Client", "Modules", "Data")
-local Placement = TS.import(script, game:GetService("ReplicatedStorage"), "Client", "Placement", "Placement")
 local InputManager = TS.import(script, game:GetService("ReplicatedStorage"), "Client", "Modules", "InputManager")
+local Placement = TS.import(script, game:GetService("ReplicatedStorage"), "Client", "Placement", "Placement")
 local HandleAction = function(InputAction)
 	local SplittedActionName = string.split(InputAction.Action, " ")
 	if SplittedActionName[1] == "Slot" then

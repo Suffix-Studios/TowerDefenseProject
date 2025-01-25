@@ -1,16 +1,18 @@
 -- Compiled with roblox-ts v3.0.0
 local TS = require(game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("RuntimeLib"))
+-- eslint-disable roblox-ts/no-array-pairs 
 local _services = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "services")
 local Players = _services.Players
 local ReplicatedStorage = _services.ReplicatedStorage
 local RunService = _services.RunService
 local Workspace = _services.Workspace
+local ClientEvents = TS.import(script, game:GetService("ReplicatedStorage"), "Client", "Modules", "ClientNetworking").ClientEvents
+local TowerRange = TS.import(script, game:GetService("ReplicatedStorage"), "Client", "UI", "TowerRanges")
+local TowersInfo = TS.import(script, game:GetService("ReplicatedStorage"), "Modules", "TowersInfo")
 local _PlacementUtils = TS.import(script, game:GetService("ReplicatedStorage"), "Client", "Placement", "PlacementUtils")
+local GetScreenPointRay = _PlacementUtils.GetScreenPointRay
 local RaycastFromMouse = _PlacementUtils.RaycastFromMouse
 local TogglePlacedTowersHitbox = _PlacementUtils.TogglePlacedTowersHitbox
-local TowersInfo = TS.import(script, game:GetService("ReplicatedStorage"), "Modules", "TowersInfo")
-local TowerRangeDisplay = TS.import(script, game:GetService("ReplicatedStorage"), "Client", "Modules", "Entities", "ClientTower", "RangeDisplay")
-local ClientEvents = TS.import(script, game:GetService("ReplicatedStorage"), "Client", "Modules", "ClientNetworking").ClientEvents
 local Player = Players.LocalPlayer
 local Camera = Workspace.CurrentCamera
 local ValidPlacementRangeColor = "6acbff"
@@ -24,10 +26,9 @@ do
 	local _placementConnection
 	local _rangeDisplay
 	local GetMouseRayParams = function(ignoreModel)
-		local Character = Player.Character
 		local MouseRayParams = RaycastParams.new()
 		MouseRayParams.FilterType = Enum.RaycastFilterType.Exclude
-		MouseRayParams.FilterDescendantsInstances = { Character, ignoreModel }
+		MouseRayParams.FilterDescendantsInstances = { Workspace:FindFirstChild("Enemies"), Player.Character, ignoreModel }
 		return MouseRayParams
 	end
 	local GetPlacementModel = function(ModelName)
@@ -60,39 +61,36 @@ do
 		end
 		print("Started Placing")
 		_hollow = GetPlacementModel(TowerName)
-		local _result = _hollow
-		if _result ~= nil then
-			_result = _result:GetPivot().Position
-		end
-		_rangeDisplay = TowerRangeDisplay.new(_result, Color3.fromHex(ValidPlacementRangeColor), TowerInfo.Range)
+		_rangeDisplay = TowerRange.new({
+			Parent = _hollow,
+			RangeColor = Color3.fromHex(ValidPlacementRangeColor),
+			RangeSize = TowerInfo.Range,
+			TowerId = -100,
+		})
 		_container.isPlacing = true
 		TogglePlacedTowersHitbox(true)
 		_placementConnection = RunService.RenderStepped:Connect(function()
 			local RayResult = RaycastFromMouse(GetMouseRayParams(_hollow))
 			if RayResult then
 				local RayCFrame = CFrame.new(RayResult.Position)
+				local _result = _hollow
+				if _result ~= nil then
+					_result = _result:GetPivot():Lerp(RayCFrame, 0.15)
+				end
+				local newCFrame = _result
 				local _result_1 = _hollow
 				if _result_1 ~= nil then
-					_result_1 = _result_1:GetPivot():Lerp(RayCFrame, 0.15)
-				end
-				local newCFrame = _result_1
-				local _result_2 = _hollow
-				if _result_2 ~= nil then
-					_result_2:PivotTo(newCFrame)
-				end
-				local _result_3 = _rangeDisplay
-				if _result_3 ~= nil then
-					_result_3:SetPosition(newCFrame.Position)
+					_result_1:PivotTo(newCFrame)
 				end
 				if RayResult.Instance:HasTag(TowerInfo.Type) then
-					local _result_4 = _rangeDisplay
-					if _result_4 ~= nil then
-						_result_4.Color(Color3.fromHex(ValidPlacementRangeColor))
+					local _result_2 = _rangeDisplay
+					if _result_2 ~= nil then
+						_result_2.Color(Color3.fromHex(ValidPlacementRangeColor))
 					end
 				else
-					local _result_4 = _rangeDisplay
-					if _result_4 ~= nil then
-						_result_4.Color(Color3.fromHex(InvalidPlacementRangeColor))
+					local _result_2 = _rangeDisplay
+					if _result_2 ~= nil then
+						_result_2.Color(Color3.fromHex(InvalidPlacementRangeColor))
 					end
 				end
 			end
@@ -127,7 +125,8 @@ do
 		end
 		local TargetCFrame = _TargetCFrame
 		if Placement.CurrentSlot ~= nil then
-			ClientEvents.PlaceTower:fire(Camera.CFrame, TargetCFrame, Placement.CurrentSlot)
+			local Ray = GetScreenPointRay()
+			ClientEvents.PlaceTower:fire(Ray.Origin, Ray.Direction, Placement.CurrentSlot)
 			Placement.Stop()
 		end
 	end

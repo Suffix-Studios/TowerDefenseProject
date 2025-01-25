@@ -1,171 +1,183 @@
 type TowerInfo = {
-    Damage: number,
-    Range: number,
-    SPA: number,
+	Damage: number;
+	Range: number;
+	SPA: number;
 
-    Limit: number,
-    Type: string,
-    Cost: number
+	Limit: number;
+	Type: string;
+	Cost: number;
 
-    AttackInfo: object
+	AttackInfo: object;
 
-    Upgrades: {Damage: number, SPA: number, Range: number, Cost: number}[]
-}
+	Upgrades: { Damage: number; SPA: number; Range: number; Cost: number }[];
+};
 
 const TowersInfo = new ReadonlyMap<string, TowerInfo>([
-	["TestTower_Single", {
-		Damage: 25,
-		SPA: 1,
-		Range: 20,
+	[
+		"TestTower_Single",
+		{
+			Damage: 25,
+			SPA: 1,
+			Range: 20,
 
-		Limit: 6,
-		Type: "Ground",
-		Cost: 500,
+			Limit: 6,
+			Type: "Ground",
+			Cost: 500,
 
-		AttackInfo: {
-			Type: "Single",
+			AttackInfo: {
+				Type: "Single",
+			},
+
+			Upgrades: [
+				{
+					Damage: 20,
+					SPA: 6,
+					Range: 32,
+
+					Cost: 650,
+				},
+				{
+					Damage: 31,
+					SPA: 4.5,
+					Range: 37,
+
+					Cost: 900,
+				},
+				{
+					Damage: 43,
+					SPA: 2,
+					Range: 45,
+
+					Cost: 1500,
+				},
+			],
 		},
+	],
 
-		Upgrades: [
-			{
-				Damage: 20,
-				SPA: 6,
-				Range: 32,
+	[
+		"TestTower_Cone",
+		{
+			Damage: 25,
+			SPA: 1,
+			Range: 20,
 
-				Cost: 650,
-            },
-			{
-				Damage: 31,
-				SPA: 4.5,
-				Range: 37,
+			Limit: 6,
+			Type: "Ground",
+			Cost: 500,
 
-				Cost: 900,
+			AttackInfo: {
+				Type: "Cone",
+				Angle: 45,
 			},
-			{
-				Damage: 43,
-				SPA: 2,
-				Range: 45,
 
-				Cost: 1500,
-			},
-        ],
-	}],
+			Upgrades: [
+				{
+					Damage: 20,
+					SPA: 6,
+					Range: 32,
 
-	["TestTower_Cone", {
-		Damage: 25,
-		SPA: 1,
-		Range: 20,
+					Cost: 650,
+				},
+				{
+					Damage: 31,
+					SPA: 4.5,
+					Range: 37,
 
-		Limit: 6,
-		Type: "Ground",
-		Cost: 500,
+					Cost: 900,
+				},
+				{
+					Damage: 43,
+					SPA: 2,
+					Range: 45,
 
-		AttackInfo: {
-			Type: "Cone",
-			Angle: 45,
+					Cost: 1500,
+				},
+			],
 		},
+	],
 
-		Upgrades: [
-			{
-				Damage: 20,
-				SPA: 6,
-				Range: 32,
+	[
+		"TestTower_Circle",
+		{
+			Damage: 25,
+			SPA: 1,
+			Range: 20,
 
-				Cost: 650,
-            },
-			{
-				Damage: 31,
-				SPA: 4.5,
-				Range: 37,
+			Limit: 6,
+			Type: "Ground",
+			Cost: 500,
 
-				Cost: 900,
+			AttackInfo: {
+				Type: "Circle",
+				Size: 5,
 			},
-			{
-				Damage: 43,
-				SPA: 2,
-				Range: 45,
 
-				Cost: 1500,
-			},
-        ],
-	}],
+			Upgrades: [
+				{
+					Damage: 20,
+					SPA: 6,
+					Range: 32,
 
-	["TestTower_Circle", {
-		Damage: 25,
-		SPA: 1,
-		Range: 20,
+					Cost: 650,
+				},
+				{
+					Damage: 31,
+					SPA: 4.5,
+					Range: 37,
 
-		Limit: 6,
-		Type: "Ground",
-		Cost: 500,
+					Cost: 900,
+				},
+				{
+					Damage: 43,
+					SPA: 2,
+					Range: 45,
 
-		AttackInfo: {
-			Type: "Circle",
-			Size: 5,
+					Cost: 1500,
+				},
+			],
 		},
+	],
 
-		Upgrades: [
-			{
-				Damage: 20,
-				SPA: 6,
-				Range: 32,
+	[
+		"TestTower_Full",
+		{
+			Damage: 25,
+			SPA: 1,
+			Range: 20,
 
-				Cost: 650,
-            },
-			{
-				Damage: 31,
-				SPA: 4.5,
-				Range: 37,
+			Limit: 6,
+			Type: "Ground",
+			Cost: 500,
 
-				Cost: 900,
+			AttackInfo: {
+				Type: "Full",
 			},
-			{
-				Damage: 43,
-				SPA: 2,
-				Range: 45,
 
-				Cost: 1500,
-			},
-        ],
-	}],
+			Upgrades: [
+				{
+					Damage: 20,
+					SPA: 6,
+					Range: 32,
 
-	["TestTower_Full", {
-		Damage: 25,
-		SPA: 1,
-		Range: 20,
+					Cost: 650,
+				},
+				{
+					Damage: 31,
+					SPA: 4.5,
+					Range: 37,
 
-		Limit: 6,
-		Type: "Ground",
-		Cost: 500,
+					Cost: 900,
+				},
+				{
+					Damage: 43,
+					SPA: 2,
+					Range: 45,
 
-		AttackInfo: {
-			Type: "Full",
+					Cost: 1500,
+				},
+			],
 		},
-
-		Upgrades: [
-			{
-				Damage: 20,
-				SPA: 6,
-				Range: 32,
-
-				Cost: 650,
-            },
-			{
-				Damage: 31,
-				SPA: 4.5,
-				Range: 37,
-
-				Cost: 900,
-			},
-			{
-				Damage: 43,
-				SPA: 2,
-				Range: 45,
-
-				Cost: 1500,
-			},
-        ],
-	}],
-])
+	],
+]);
 
 export = TowersInfo;

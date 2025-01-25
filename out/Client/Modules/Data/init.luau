@@ -9,18 +9,21 @@ DeepEquals = function(t1, t2)
 		if t2[index] == nil then
 			return false
 		else
+			--/ if the value isn't nil
 			--/ Checking if they are the same type (same values must be same type duh)
 			local _exp = typeof(value)
 			local _arg0 = t2[index]
 			if _exp ~= typeof(_arg0) then
 				return false
 			else
+				--/ if the two values are the same type
 				--/ compare normally if the value isn't nil
 				if typeof(value) ~= "table" then
 					if t2[index] ~= value then
 						return false
 					end
 				else
+					--/ if the value is a table, compare it again using this function (both values are tables at this point, so they are valid args for this function)
 					if DeepEquals(t2[index], value) then
 						return false
 					end
@@ -70,18 +73,14 @@ do
 		local _arg1 = `Invalid Argument #1, Player Has No Data With Name \{DataName\}`
 		assert(_arg0, _arg1)
 		if ClientData.Data[DataName] ~= nil then
-			local __signals = _signals
 			local _dataName = DataName
-			if __signals[_dataName] ~= nil then
-				local __signals_1 = _signals
+			if _signals[_dataName] ~= nil then
 				local _dataName_1 = DataName
-				return __signals_1[_dataName_1]
+				return _signals[_dataName_1]
 			else
 				local dataSignal = Signal.new()
-				local __signals_1 = _signals
 				local _dataName_1 = DataName
-				local _dataSignal = dataSignal
-				__signals_1[_dataName_1] = _dataSignal
+				_signals[_dataName_1] = dataSignal
 				return dataSignal
 			end
 		end

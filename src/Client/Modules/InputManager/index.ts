@@ -1,52 +1,66 @@
 import Signal from "@rbxts/lemon-signal";
+import { UserInputService } from "@rbxts/services";
 import { InputAction } from "../ClientTypes";
 import Actions from "./Actions";
-import { UserInputService } from "@rbxts/services";
 
-abstract class InputManager {
-    public static readonly ActionBegan = new Signal<InputAction>();
-    public static readonly ActionEnded = new Signal<InputAction>();
-    private static _actionsSignals = new Map<string, Signal<InputAction>>();
+namespace InputManager {
+	export const ActionBegan = new Signal<InputAction>();
+	export const ActionEnded = new Signal<InputAction>();
+	const _actionsSignals = new Map<string, Signal<InputAction>>();
 
-    public static InvokeAction(this: void, ActionName: string, State: Enum.UserInputState, Key: Enum.KeyCode | Enum.UserInputType | undefined): void {
-        assert(Actions.has(ActionName), `Invalid Action Name, Not Valid Action With Name ${ActionName}`);
+	export const InvokeAction = (
+		ActionName: string,
+		State: Enum.UserInputState,
+		Key: Enum.KeyCode | Enum.UserInputType | undefined,
+	): void => {
+		assert(Actions.has(ActionName), `Invalid Action Name, Not Valid Action With Name ${ActionName}`);
 
-        const ActionInfo: InputAction = {
-            Action: ActionName,
-            State: State,
-            Key: Key === undefined ? Key as unknown as Enum.KeyCode : Enum.KeyCode.Unknown
-        }
+		const ActionInfo: InputAction = {
+			Action: ActionName,
+			State: State,
+			Key: Key === undefined ? (Key as unknown as Enum.KeyCode) : Enum.KeyCode.Unknown,
+		};
 
-        if(State === Enum.UserInputState.Begin) InputManager.ActionBegan.Fire(ActionInfo)
-            else InputManager.ActionEnded.Fire(ActionInfo);
+		if (State === Enum.UserInputState.Begin) ActionBegan.Fire(ActionInfo);
+		else ActionEnded.Fire(ActionInfo);
 
-        if(InputManager._actionsSignals.has(ActionName)) {
-            InputManager._actionsSignals.get(ActionName)?.Fire(ActionInfo);
-        }
-    };
+		if (_actionsSignals.has(ActionName)) {
+			_actionsSignals.get(ActionName)?.Fire(ActionInfo);
+		}
+	};
 
-    public static BindActionToButton(this: void, Button: GuiButton, ActionName: string): void {
-        if(!Button) return;
+	export const BindActionToButton = (Button: GuiButton, ActionName: string): void => {
+		if (!Button) return;
 
-        Button.Activated.Connect(() => {
-            InputManager.InvokeAction(ActionName, Enum.UserInputState.Begin, undefined);
-        })
-    };
+		Button.Activated.Connect(() => {
+			InvokeAction(ActionName, Enum.UserInputState.Begin, undefined);
+		});
+	};
 
-    public static ListenToAction(this: void, ActionName: string): Signal<InputAction> {
-        assert(Actions.has(ActionName), `Invalid Action Name, Not Valid Action With Name ${ActionName}`);
+	export const ListenToAction = (ActionName: string): Signal<InputAction> => {
+		assert(Actions.has(ActionName), `Invalid Action Name, Not Valid Action With Name ${ActionName}`);
 
-        let ActionSignal: Signal<InputAction>;
+		let ActionSignal: Signal<InputAction>;
 
-        if(InputManager._actionsSignals.has(ActionName)) {
-            ActionSignal = InputManager._actionsSignals.get(ActionName) as Signal<InputAction>;
-        } else {
-            ActionSignal = new Signal<InputAction>();
-            InputManager._actionsSignals.set(ActionName, ActionSignal);
-        }
+		if (_actionsSignals.has(ActionName)) {
+			ActionSignal = _actionsSignals.get(ActionName) as Signal<InputAction>;
+		} else {
+			ActionSignal = new Signal<InputAction>();
+			_actionsSignals.set(ActionName, ActionSignal);
+		}
 
-        return ActionSignal;
-    }
+		return ActionSignal;
+	};
+
+	export const IsActionHeld = (ActionName: string & keyof typeof Actions): boolean => {
+		assert(Actions.has(ActionName), "Invalid Action Name!");
+
+		Actions.get(ActionName)?.forEach((Key) => {
+			if (UserInputService.IsKeyDown(Key as Enum.KeyCode)) return true;
+		});
+
+		return false;
+	};
 }
 
 export = InputManager;

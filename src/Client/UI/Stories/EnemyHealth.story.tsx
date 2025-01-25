@@ -1,33 +1,15 @@
-// import { Workspace } from "@rbxts/services";
-// import { Choose, CreateVideStory, InferVideProps, Slider } from "@rbxts/ui-labs";
-// import Vide from "@rbxts/vide";
-// import { EnemyHealthUI } from "Gui/EnemyHealth";
+import { Choose, Slider } from "@rbxts/ui-labs";
+import Vide from "@rbxts/vide";
+import { EnemyHealthUI } from "../Components/EnemyOverhead";
+import { CreateVideWithAtomsStory } from "./StoryCreator";
 
-// const controls = {
-//     MaxHealth: 100,
-//     Health: Slider(100, 0, 100, 1),
-//     BarColor: Color3.fromRGB(255, 0, 0),
-//     HealthAmoutType: Choose(["Number Only", "Number Over Max", "Percentage"])
-// }
+const controls = {
+	Health: Slider(100, 0, 100, 1),
+	HealthAmountType: Choose(["Number Only", "Number Over Max", "Percentage"]),
+};
 
-// const story = {
-//     vide: Vide,
-//     controls: controls,
+const story = CreateVideWithAtomsStory(controls, (Controls, Parent) => {
+	<EnemyHealthUI Health={Controls.Health} TextType={Controls.HealthAmountType} Parent={Parent} />;
+});
 
-//     story: (props: InferVideProps<typeof controls>) => {
-//         Vide.cleanup(()=> {
-//             print("cleanup");
-//         })
-
-//         print(props.target)
-
-//         return <EnemyHealthUI
-//             Health={props.controls.Health}
-//             MaxHealth={props.controls.MaxHealth}
-//             BarColor={props.controls.BarColor}
-//             TextType={props.controls.HealthAmoutType as Vide.Source<string>}
-//         />;
-//    }
-// }
-
-// export = story;
+export = story;

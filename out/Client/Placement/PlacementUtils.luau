@@ -6,18 +6,22 @@ local UserInputService = _services.UserInputService
 local Workspace = _services.Workspace
 local PlacedTowersFolder = Workspace:WaitForChild("PlacedTowers")
 local Camera = Workspace.CurrentCamera
-local RaycastFromMouse = function(Params)
+local GetScreenPointRay = function()
 	local MouseScreenPosition = UserInputService:GetMouseLocation()
 	local _result = Camera
 	if _result ~= nil then
 		_result = _result:ScreenPointToRay(MouseScreenPosition.X, MouseScreenPosition.Y - (GuiService:GetGuiInset()).Y)
 	end
 	local Ray = _result
-	local _result_1 = Ray
-	if _result_1 ~= nil then
-		_result_1 = _result_1.Origin
+	return Ray
+end
+local RaycastFromMouse = function(Params)
+	local Ray = GetScreenPointRay()
+	local _result = Ray
+	if _result ~= nil then
+		_result = _result.Origin
 	end
-	local Raycast = Workspace:Raycast(_result_1, Ray.Direction * 100, Params)
+	local Raycast = Workspace:Raycast(_result, Ray.Direction * 100, Params)
 	if Raycast and Raycast.Instance then
 		return Raycast
 	else
@@ -25,14 +29,21 @@ local RaycastFromMouse = function(Params)
 	end
 end
 local TogglePlacedTowersHitbox = function(Toggle)
-	for _, TowerModel in pairs(PlacedTowersFolder:GetChildren()) do
+	local _exp = PlacedTowersFolder:GetChildren()
+	-- ▼ ReadonlyArray.forEach ▼
+	local _callback = function(TowerModel)
 		local Hitbox = TowerModel:FindFirstChild("RedArea")
 		if Hitbox ~= nil then
 			Hitbox.Transparency = if Toggle then 0.5 else 1
 		end
 	end
+	for _k, _v in _exp do
+		_callback(_v, _k - 1, _exp)
+	end
+	-- ▲ ReadonlyArray.forEach ▲
 end
 return {
+	GetScreenPointRay = GetScreenPointRay,
 	RaycastFromMouse = RaycastFromMouse,
 	TogglePlacedTowersHitbox = TogglePlacedTowersHitbox,
 }

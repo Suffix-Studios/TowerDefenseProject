@@ -1,16 +1,16 @@
 -- Compiled with roblox-ts v3.0.0
 local TS = require(game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("RuntimeLib"))
 local t = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "t", "lib", "ts").t
-local _Networking = TS.import(script, game:GetService("ReplicatedStorage"), "Modules", "CoreLibs", "Networking")
-local GlobalEvents = _Networking.GlobalEvents
-local GlobalFunctions = _Networking.GlobalFunctions
+local _index_ts = TS.import(script, game:GetService("ReplicatedStorage"), "Modules", "CoreLibs", "Networking", "init.ts")
+local GlobalEvents = _index_ts.GlobalEvents
+local GlobalFunctions = _index_ts.GlobalFunctions
 local ServerEvents = GlobalEvents:createServer({}, {
 	incomingIds = { "PlaceTower" },
 	incoming = {
-		PlaceTower = { { t.CFrame, t.CFrame, t.literal("Slot1", "Slot2", "Slot3", "Slot4", "Slot5", "Slot6") }, nil },
+		PlaceTower = { { t.Vector3, t.Vector3, t.literal("Slot 1", "Slot 2", "Slot 3", "Slot 4", "Slot 5", "Slot 6") }, nil },
 	},
 	incomingUnreliable = {},
-	outgoingIds = { "ReplicateData", "ReplicateEnemies", "EntityAdded", "EntityRemoved" },
+	outgoingIds = { "ReplicateData", "ReplicateEnemies", "EnemyAdded", "TowerAdded", "EntityRemoved" },
 	outgoingUnreliable = {},
 	namespaceIds = {},
 	namespaces = {},
@@ -20,10 +20,8 @@ local ServerFunctions = GlobalFunctions:createServer({}, {
 	incoming = {
 		RequestData = { {}, nil },
 	},
-	outgoingIds = { "RequestData" },
-	outgoing = {
-		RequestData = t.any,
-	},
+	outgoingIds = {},
+	outgoing = {},
 	namespaceIds = {},
 	namespaces = {},
 })

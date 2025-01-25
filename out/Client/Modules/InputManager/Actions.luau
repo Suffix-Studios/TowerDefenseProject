@@ -13,7 +13,7 @@ local Actions = {
 	},
 }
 local ActionsMap = {}
-for ActionsCategory, ActionsObject in pairs(Actions) do
+for _, ActionsObject in pairs(Actions) do
 	for ActionName, ActionBindings in pairs(ActionsObject) do
 		ActionsMap[ActionName] = ActionBindings
 	end

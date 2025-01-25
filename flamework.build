@@ -19,7 +19,10 @@
 		"towerdefenseproject:out/Client/Modules/ClientEnemy@$p:error": "Client/Modules/ClientEnemy@$p:error",
 		"towerdefenseproject:out/Client/Modules/Entities/ClientEnemy@ClientEnemy": "Client/Modules/Entities/ClientEnemy@ClientEnemy",
 		"towerdefenseproject:out/Server/Modules/Entities/Enemy@Enemy": "Server/Modules/Entities/Enemy@Enemy",
-		"towerdefenseproject:out/Client/Modules/Entities/ClientTower/RangeDisplay@TowerRangeDisplay": "Client/Modules/Entities/ClientTower/RangeDisplay@TowerRangeDisplay"
+		"towerdefenseproject:out/Client/Modules/Entities/ClientTower/RangeDisplay@TowerRangeDisplay": "Client/Modules/Entities/ClientTower/RangeDisplay@TowerRangeDisplay",
+		"towerdefenseproject:out/Client/UI/TowerRanges@TowerRange": "Client/UI/TowerRanges@TowerRange",
+		"towerdefenseproject:out/Shared/CoreLibs/Networking/init.ts@GlobalEvents": "Shared/CoreLibs/Networking/init.ts@GlobalEvents",
+		"towerdefenseproject:out/Shared/CoreLibs/Networking/init.ts@GlobalFunctions": "Shared/CoreLibs/Networking/init.ts@GlobalFunctions"
 	},
 	"metadata": {}
 }

@@ -1,24 +1,17 @@
 -- Compiled with roblox-ts v3.0.0
 local TS = require(game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("RuntimeLib"))
 local t = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "t", "lib", "ts").t
-local _Networking = TS.import(script, game:GetService("ReplicatedStorage"), "Modules", "CoreLibs", "Networking")
-local GlobalEvents = _Networking.GlobalEvents
-local GlobalFunctions = _Networking.GlobalFunctions
+local _index_ts = TS.import(script, game:GetService("ReplicatedStorage"), "Modules", "CoreLibs", "Networking", "init.ts")
+local GlobalEvents = _index_ts.GlobalEvents
+local GlobalFunctions = _index_ts.GlobalFunctions
 local ClientEvents = GlobalEvents:createClient({}, {
-	incomingIds = { "ReplicateData", "ReplicateEnemies", "EntityAdded", "EntityRemoved" },
+	incomingIds = { "ReplicateData", "ReplicateEnemies", "EnemyAdded", "TowerAdded", "EntityRemoved" },
 	incoming = {
-		ReplicateData = { { t.any }, nil },
-		ReplicateEnemies = { { t.string }, nil },
-		EntityAdded = { { t.string, t.union(t.interface({
-			Id = t.optional(t.string),
-			ModelName = t.string,
-			Health = t.number,
-			IsAir = t.boolean,
-			EnemyType = t.literal("Normal", "Speedy", "Tanky", "Boss"),
-			Speed = t.number,
-			SpawnCFrame = t.CFrame,
-		}), t.any) }, nil },
-		EntityRemoved = { { t.string, t.string }, nil },
+		ReplicateData = { { t.union(t.any, t.none) }, nil },
+		ReplicateEnemies = { { t.array(t.typeof("buffer")) }, nil },
+		EnemyAdded = { { t.typeof("buffer") }, nil },
+		TowerAdded = { { t.typeof("buffer") }, nil },
+		EntityRemoved = { { t.number }, nil },
 	},
 	incomingUnreliable = {},
 	outgoingIds = { "PlaceTower" },
@@ -27,13 +20,11 @@ local ClientEvents = GlobalEvents:createClient({}, {
 	namespaces = {},
 })
 local ClientFunctions = GlobalFunctions:createClient({}, {
-	incomingIds = { "RequestData" },
-	incoming = {
-		RequestData = { {}, nil },
-	},
+	incomingIds = {},
+	incoming = {},
 	outgoingIds = { "RequestData" },
 	outgoing = {
-		RequestData = t.any,
+		RequestData = t.union(t.any, t.none),
 	},
 	namespaceIds = {},
 	namespaces = {},

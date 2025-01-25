@@ -1,24 +1,13 @@
-// import { InferVideProps } from "@rbxts/ui-labs";
-// import Vide from "@rbxts/vide";
-// import { TowerRangeUI } from "../TowerRange";
+import Vide from "@rbxts/vide";
+import { TowerRangeUI } from "../Components/TowerRange";
+import { CreateVideWithAtomsStory } from "./StoryCreator";
 
-// const controls = {
-//     Color: Color3.fromHex("FFFFFF")
-// }
+const controls = {
+	Color: Color3.fromHex("FFFFFF"),
+};
 
-// const story = {
-//     vide: Vide,
-//     controls: controls,
+const story = CreateVideWithAtomsStory(controls, (Controls, Parent) => {
+	<TowerRangeUI Color={Controls.Color} Parent={Parent} />;
+});
 
-//     story: (props: InferVideProps<typeof controls>) => {
-//         Vide.cleanup(()=> {
-//             print("cleanup");
-//         })
-
-//         return <TowerRangeUI
-//             Color={props.controls.Color}
-//         />;
-//     }
-// }
-
-// export = story;
+export = story;
