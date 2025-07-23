@@ -1,11 +1,11 @@
 const Actions = {
 	Slots: {
-		"Slot 1": [Enum.KeyCode.One],
-		"Slot 2": [Enum.KeyCode.Two],
-		"Slot 3": [Enum.KeyCode.Three],
-		"Slot 4": [Enum.KeyCode.Four],
-		"Slot 5": [Enum.KeyCode.Five],
-		"Slot 6": [Enum.KeyCode.Six],
+		"1": [Enum.KeyCode.One],
+		"2": [Enum.KeyCode.Two],
+		"3": [Enum.KeyCode.Three],
+		"4": [Enum.KeyCode.Four],
+		"5": [Enum.KeyCode.Five],
+		"6": [Enum.KeyCode.Six],
 	},
 
 	Interactions: {
@@ -13,12 +13,12 @@ const Actions = {
 	},
 };
 
-const ActionsMap = new Map<string, Array<Enum.KeyCode | Enum.UserInputType>>();
+const actionsMap = new Map<string, Array<Enum.KeyCode | Enum.UserInputType>>();
 
-for (const [_, ActionsObject] of pairs(Actions)) {
-	for (const [ActionName, ActionBindings] of pairs(ActionsObject)) {
-		ActionsMap.set(ActionName as string, ActionBindings as Array<Enum.KeyCode | Enum.UserInputType>);
+for (const [_, actionsObject] of pairs(Actions)) {
+	for (const [actionName, actionBindings] of pairs(actionsObject)) {
+		actionsMap.set(actionName as string, actionBindings as Array<Enum.KeyCode | Enum.UserInputType>);
 	}
 }
 
-export = ActionsMap;
+export = actionsMap;

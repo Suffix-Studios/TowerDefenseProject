@@ -1,4 +1,4 @@
-import PublicTypes from "./CoreLibs/PublicTypes";
+import { Shared } from "./Types";
 
 export const PlayerDataTemplate = {
 	Gold: 0,
@@ -9,13 +9,6 @@ export const PlayerDataTemplate = {
 
 	MaxTowers: 60,
 
-	TowersInventory: new Map<string, PublicTypes.InventoryTower>(),
-	Loadout: new Map<string, string>([
-		["Slot 1", ""],
-		["Slot 2", ""],
-		["Slot 3", ""],
-		["Slot 4", ""],
-		["Slot 5", ""],
-		["Slot 6", ""],
-	]),
+	TowersInventory: new Map<string, Shared.InventoryTower>(),
+	Loadout: ["", "", "", "", "", ""],
 };

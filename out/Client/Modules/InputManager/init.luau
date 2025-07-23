@@ -6,69 +6,60 @@ local Actions = TS.import(script, game:GetService("ReplicatedStorage"), "Client"
 local InputManager = {}
 do
 	local _container = InputManager
-	local ActionBegan = Signal.new()
-	_container.ActionBegan = ActionBegan
-	local ActionEnded = Signal.new()
-	_container.ActionEnded = ActionEnded
+	local actionBegan = Signal.new()
+	_container.actionBegan = actionBegan
+	local actionEnded = Signal.new()
+	_container.actionEnded = actionEnded
 	local _actionsSignals = {}
-	local InvokeAction = function(ActionName, State, Key)
+	local invokeAction = function(ActionName, State, Key)
 		local _actionName = ActionName
 		local _arg0 = Actions[_actionName] ~= nil
 		local _arg1 = `Invalid Action Name, Not Valid Action With Name {ActionName}`
 		assert(_arg0, _arg1)
-		local ActionInfo = {
+		local actionInfo = {
 			Action = ActionName,
 			State = State,
 			Key = if Key == nil then Key else Enum.KeyCode.Unknown,
 		}
 		if State == Enum.UserInputState.Begin then
-			ActionBegan:Fire(ActionInfo)
+			actionBegan:Fire(actionInfo)
 		else
-			ActionEnded:Fire(ActionInfo)
+			actionEnded:Fire(actionInfo)
 		end
 		local _actionName_1 = ActionName
 		if _actionsSignals[_actionName_1] ~= nil then
 			local _actionName_2 = ActionName
 			local _result = _actionsSignals[_actionName_2]
 			if _result ~= nil then
-				_result:Fire(ActionInfo)
+				_result:Fire(actionInfo)
 			end
 		end
 	end
-	_container.InvokeAction = InvokeAction
-	local BindActionToButton = function(Button, ActionName)
-		if not Button then
-			return nil
-		end
-		Button.Activated:Connect(function()
-			InvokeAction(ActionName, Enum.UserInputState.Begin, nil)
-		end)
-	end
-	_container.BindActionToButton = BindActionToButton
-	local ListenToAction = function(ActionName)
-		local _actionName = ActionName
+	_container.invokeAction = invokeAction
+	local listenToAction = function(actionName)
+		local _actionName = actionName
 		local _arg0 = Actions[_actionName] ~= nil
-		local _arg1 = `Invalid Action Name, Not Valid Action With Name {ActionName}`
+		local _arg1 = `Invalid Action Name, Not Valid Action With Name {actionName}`
 		assert(_arg0, _arg1)
-		local ActionSignal
-		local _actionName_1 = ActionName
+		local actionSignal
+		local _actionName_1 = actionName
 		if _actionsSignals[_actionName_1] ~= nil then
-			local _actionName_2 = ActionName
-			ActionSignal = _actionsSignals[_actionName_2]
+			local _actionName_2 = actionName
+			actionSignal = _actionsSignals[_actionName_2]
 		else
-			ActionSignal = Signal.new()
-			local _actionName_2 = ActionName
-			local _actionSignal = ActionSignal
+			actionSignal = Signal.new()
+			local _actionName_2 = actionName
+			local _actionSignal = actionSignal
 			_actionsSignals[_actionName_2] = _actionSignal
 		end
-		return ActionSignal
+		return actionSignal
 	end
-	_container.ListenToAction = ListenToAction
-	local IsActionHeld = function(ActionName)
-		local _actionName = ActionName
+	_container.listenToAction = listenToAction
+	local isActionHeld = function(actionName)
+		local _actionName = actionName
 		local _arg0 = Actions[_actionName] ~= nil
 		assert(_arg0, "Invalid Action Name!")
-		local _actionName_1 = ActionName
+		local _actionName_1 = actionName
 		local _result = Actions[_actionName_1]
 		if _result ~= nil then
 			-- ▼ ReadonlyArray.forEach ▼
@@ -84,6 +75,6 @@ do
 		end
 		return false
 	end
-	_container.IsActionHeld = IsActionHeld
+	_container.isActionHeld = isActionHeld
 end
 return InputManager

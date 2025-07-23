@@ -7,37 +7,20 @@ local Players = _services.Players
 local RunService = _services.RunService
 --/ Packages
 local ProfileService = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "profileservice", "src")
+local PlayerDataTemplate = TS.import(script, game:GetService("ReplicatedStorage"), "Modules", "Constants").PlayerDataTemplate
 local TowersInfo = TS.import(script, game:GetService("ReplicatedStorage"), "Modules", "TowersInfo")
-local _ServerNetworking = TS.import(script, game:GetService("ServerScriptService"), "Modules", "ServerNetworking")
-local ServerEvents = _ServerNetworking.ServerEvents
-local ServerFunctions = _ServerNetworking.ServerFunctions
-local DataTemplate = {
-	Gold = 0,
-	Silver = 100,
-	Level = 1,
-	Exp = 0,
-	MaxTowers = 60,
-	TowersInventory = {},
-	Loadout = {
-		["Slot 1"] = "",
-		["Slot 2"] = "",
-		["Slot 3"] = "",
-		["Slot 4"] = "",
-		["Slot 5"] = "",
-		["Slot 6"] = "",
-	},
-}
+local requestData = TS.import(script, game:GetService("ServerScriptService"), "Modules", "Network", "PlayerData").requestData
 local StartingTowers = { "TestTower_Single", "TestTower_Cone", "TestTower_Circle", "TestTower_Full" }
-local ProfileStore = if RunService:IsStudio() then ProfileService.GetProfileStore("Players_Data_xxx0", DataTemplate).Mock else ProfileService.GetProfileStore("Players_Data_xxx0", DataTemplate)
+local ProfileStore = if RunService:IsStudio() then ProfileService.GetProfileStore("Players_Data_xxx0", PlayerDataTemplate).Mock else ProfileService.GetProfileStore("Players_Data_xxx0", PlayerDataTemplate)
 local Profiles = {}
 local GetUniqueTowerId = function(Player, TowerName)
 	return `{TowerName}-{Player.UserId}_{HttpService:GenerateGUID(false)}`
 end
-local ReplicateData = function(Player, Data)
-	ServerEvents.ReplicateData:fire(Player, Data)
-end
+-- const ReplicateData = (Player: Player, Data: Shared.PlayerData): void => {
+-- 	ServerEvents.ReplicateData.fire(Player, Data);
+-- };
 -- eslint-disable-next-line @typescript-eslint/no-explicit-any
-ServerFunctions.RequestData:setCallback(function(Player)
+requestData.on(function(Player)
 	local _player = Player
 	if not (Profiles[_player] ~= nil) then
 		for i = 1, 9 do
@@ -86,9 +69,7 @@ do
 					for i = 0, #StartingTowers - 1 do
 						local newTower = DataService.GiveTower(Player, StartingTowers[i + 1])
 						if newTower ~= nil then
-							local _loadout = PlayerProfile.Data.Loadout
-							local _arg0 = `Slot {i + 1}`
-							_loadout[_arg0] = newTower
+							PlayerProfile.Data.Loadout[i + 2] = newTower
 						end
 					end
 				end
@@ -118,7 +99,10 @@ do
 				Level = 1,
 			}
 			local TowerId = GetUniqueTowerId(Player, TowerName)
-			PlayerProfile.Data.TowersInventory[TowerId] = newTower
+			local _result = PlayerProfile.Data.TowersInventory
+			if _result ~= nil then
+				_result[TowerId] = newTower
+			end
 			return TowerId
 		end
 		return nil
@@ -149,7 +133,7 @@ do
 			local _arg0_1 = typeof(_exp) == _arg1_1
 			assert(_arg0_1, "Invalid Argument #3")
 			PlayerProfile.Data[DataName] = newValue
-			ReplicateData(Player, PlayerProfile.Data)
+			-- ReplicateData(Player, PlayerProfile.Data);
 		end
 	end
 	_container.SetData = SetData

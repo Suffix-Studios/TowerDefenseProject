@@ -5,9 +5,9 @@ import { HttpService, Players, RunService } from "@rbxts/services";
 import ProfileService from "@rbxts/profileservice";
 import { Profile } from "@rbxts/profileservice/globals";
 import { PlayerDataTemplate } from "Shared/Constants";
-import PublicTypes, { InventoryTower } from "Shared/CoreLibs/PublicTypes";
 import TowersInfo from "Shared/TowersInfo";
-import { ServerEvents, ServerFunctions } from "../ServerNetworking";
+import { Shared } from "Shared/Types";
+import { requestData } from "../Network/PlayerData";
 
 const StartingTowers = [
 	///! DONT FUCKING MAKE IT MORE THAN `DataTemplate.Loadout.size()`
@@ -21,18 +21,18 @@ const ProfileStore = RunService.IsStudio()
 	? ProfileService.GetProfileStore("Players_Data_xxx0", PlayerDataTemplate).Mock
 	: ProfileService.GetProfileStore("Players_Data_xxx0", PlayerDataTemplate);
 
-const Profiles = new Map<Player, Profile<PublicTypes.PlayerData, unknown>>();
+const Profiles = new Map<Player, Profile<Shared.PlayerData, unknown>>();
 
 const GetUniqueTowerId = (Player: Player, TowerName: string): string => {
 	return `${TowerName}-${Player.UserId}_${HttpService.GenerateGUID(false)}`;
 };
 
-const ReplicateData = (Player: Player, Data: PublicTypes.PlayerData): void => {
-	ServerEvents.ReplicateData.fire(Player, Data);
-};
+// const ReplicateData = (Player: Player, Data: Shared.PlayerData): void => {
+// 	ServerEvents.ReplicateData.fire(Player, Data);
+// };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-ServerFunctions.RequestData.setCallback((Player): any => {
+requestData.on((Player): any => {
 	if (!Profiles.has(Player)) {
 		for (let i = 1; i < 10; i++) {
 			task.wait(1);
@@ -67,7 +67,7 @@ namespace DataService {
 					for (let i = 0; i < StartingTowers.size(); i++) {
 						const newTower = DataService.GiveTower(Player, StartingTowers[i]);
 
-						if (newTower !== undefined) PlayerProfile.Data.Loadout.set(`Slot ${i + 1}`, newTower);
+						if (newTower !== undefined) PlayerProfile.Data.Loadout[i + 1] = newTower;
 					}
 				}
 			} else {
@@ -89,21 +89,21 @@ namespace DataService {
 		const Info = TowersInfo.get(TowerName);
 
 		if (Info && PlayerProfile) {
-			const newTower: InventoryTower = {
+			const newTower: Shared.InventoryTower = {
 				Exp: 0,
 				Name: TowerName,
 				Level: 1,
 			};
 
 			const TowerId = GetUniqueTowerId(Player, TowerName);
-			PlayerProfile.Data.TowersInventory.set(TowerId, newTower);
+			PlayerProfile.Data.TowersInventory?.set(TowerId, newTower);
 			return TowerId;
 		}
 
 		return undefined;
 	};
 
-	export const GetData = (Player: Player): PublicTypes.PlayerData | undefined => {
+	export const GetData = (Player: Player): Shared.PlayerData | undefined => {
 		const PlayerProfile = Profiles.get(Player);
 
 		if (PlayerProfile) {
@@ -120,16 +120,16 @@ namespace DataService {
 		if (PlayerProfile) {
 			print(PlayerProfile.Data);
 			assert(
-				PlayerProfile.Data[DataName as keyof PublicTypes.PlayerData] !== undefined,
+				PlayerProfile.Data[DataName as keyof Shared.PlayerData] !== undefined,
 				`Invalid Argument #2, Player Has No Data With Name ${DataName}!`,
 			);
 			assert(
-				typeIs(PlayerProfile.Data[DataName as keyof PublicTypes.PlayerData], typeOf(newValue)),
+				typeIs(PlayerProfile.Data[DataName as keyof Shared.PlayerData], typeOf(newValue)),
 				"Invalid Argument #3",
 			);
 
-			PlayerProfile.Data[DataName as keyof PublicTypes.PlayerData] = newValue;
-			ReplicateData(Player, PlayerProfile.Data);
+			PlayerProfile.Data[DataName as keyof Shared.PlayerData] = newValue;
+			// ReplicateData(Player, PlayerProfile.Data);
 		}
 	};
 }

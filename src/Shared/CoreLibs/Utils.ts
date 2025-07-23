@@ -1,30 +1,30 @@
 import { Workspace } from "@rbxts/services";
 
-const GetYConst = (IncludePaths: boolean): number => {
-	const Map = Workspace.FindFirstChild(`${Workspace.GetAttribute("MapName")}_Map` as string) as Folder;
-	const Waypoints = Map?.FindFirstChild("Waypoints") as Folder;
-	const SpawnWaypoint = Waypoints.FindFirstChild("Spawn") as BasePart;
-	const Paths = Map.FindFirstChild("Paths") as Instance;
+const getYConst = (includePaths: boolean): number => {
+	const map = Workspace.FindFirstChild(`${Workspace.GetAttribute("MapName")}_Map` as string) as Folder;
+	const waypoints = map?.FindFirstChild("Waypoints") as Folder;
+	const spawnWaypoint = waypoints.FindFirstChild("Spawn") as BasePart;
+	const paths = map.FindFirstChild("Paths") as Instance;
 
-	const RayOrigin = SpawnWaypoint.GetPivot().Position.add(new Vector3(0, 0, 10));
-	const RayDirection = new Vector3(0, -100, 0);
+	const rayOrigin = spawnWaypoint.GetPivot().Position.add(new Vector3(0, 0, 10));
+	const rayDirection = new Vector3(0, -100, 0);
 
-	const Params = new RaycastParams();
-	Params.FilterType = Enum.RaycastFilterType.Include;
-	Params.FilterDescendantsInstances = [Map.FindFirstChild("Ground") as Instance];
-	if (IncludePaths) Params.FilterDescendantsInstances.push(Paths);
+	const params = new RaycastParams();
+	params.FilterType = Enum.RaycastFilterType.Include;
+	params.FilterDescendantsInstances = [map.FindFirstChild("Ground") as Instance];
+	if (includePaths) params.FilterDescendantsInstances.push(paths);
 
-	const RayResult = Workspace.Raycast(RayOrigin, RayDirection, Params);
+	const rayResult = Workspace.Raycast(rayOrigin, rayDirection, params);
 
-	return RayResult === undefined ? 0 : RayResult.Position.Y;
+	return rayResult === undefined ? 0 : rayResult.Position.Y;
 };
 
-const ConstYPaths = GetYConst(true);
-const ConstY = GetYConst(false);
+const constYPaths = getYConst(true);
+const constY = getYConst(false);
 
 namespace Utils {
 	export const GetConstantYPosition = (IncludePaths: boolean) => {
-		return IncludePaths ? ConstYPaths : ConstY;
+		return IncludePaths ? constYPaths : constY;
 	};
 }
 

@@ -3,27 +3,27 @@ local TS = require(game:GetService("ReplicatedStorage"):WaitForChild("rbxts_incl
 local UserInputService = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "services").UserInputService
 local InputManager = TS.import(script, game:GetService("ReplicatedStorage"), "Client", "Modules", "InputManager")
 local Actions = TS.import(script, game:GetService("ReplicatedStorage"), "Client", "Modules", "InputManager", "Actions")
-local HandleInput = function(Input, gameProcessedEvent)
+local handleInput = function(input, gameProcessedEvent)
 	if gameProcessedEvent then
 		return nil
 	end
 	-- ▼ ReadonlyMap.forEach ▼
-	local _callback = function(ActionBindings, ActionName)
+	local _callback = function(actionBindings, actionName)
 		-- ▼ ReadonlyArray.find ▼
 		local _callback_1 = function(Binding)
-			return Binding == Input.KeyCode or Binding == Input.UserInputType
+			return Binding == input.KeyCode or Binding == input.UserInputType
 		end
 		local _result
-		for _i, _v in ActionBindings do
-			if _callback_1(_v, _i - 1, ActionBindings) == true then
+		for _i, _v in actionBindings do
+			if _callback_1(_v, _i - 1, actionBindings) == true then
 				_result = _v
 				break
 			end
 		end
 		-- ▲ ReadonlyArray.find ▲
 		if _result then
-			local Key = if Input.KeyCode ~= Enum.KeyCode.Unknown then Input.KeyCode else Input.UserInputType
-			InputManager.InvokeAction(ActionName, Input.UserInputState, Key)
+			local Key = if input.KeyCode ~= Enum.KeyCode.Unknown then input.KeyCode else input.UserInputType
+			InputManager.invokeAction(actionName, input.UserInputState, Key)
 		end
 	end
 	for _k, _v in Actions do
@@ -31,9 +31,9 @@ local HandleInput = function(Input, gameProcessedEvent)
 	end
 	-- ▲ ReadonlyMap.forEach ▲
 end
-UserInputService.InputBegan:Connect(function(Input, gameProcessedEvent)
-	return HandleInput(Input, gameProcessedEvent)
+UserInputService.InputBegan:Connect(function(input, gameProcessedEvent)
+	return handleInput(input, gameProcessedEvent)
 end)
-UserInputService.InputEnded:Connect(function(Input, gameProcessedEvent)
-	return HandleInput(Input, gameProcessedEvent)
+UserInputService.InputEnded:Connect(function(input, gameProcessedEvent)
+	return handleInput(input, gameProcessedEvent)
 end)

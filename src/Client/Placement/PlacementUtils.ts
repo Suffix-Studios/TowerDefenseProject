@@ -1,29 +1,29 @@
-import { GuiService, UserInputService, Workspace } from "@rbxts/services";
+import { UserInputService, Workspace } from "@rbxts/services";
 
-const PlacedTowersFolder = Workspace.WaitForChild("PlacedTowers") as Folder;
+const placedTowersFolder = Workspace.WaitForChild("PlacedTowers") as Folder;
 
-const Camera = Workspace.CurrentCamera;
+const camera = Workspace.CurrentCamera;
 
 export const GetScreenPointRay = (): Ray => {
-	const MouseScreenPosition = UserInputService.GetMouseLocation();
-	const Ray = Camera?.ScreenPointToRay(
-		MouseScreenPosition.X,
-		MouseScreenPosition.Y - GuiService.GetGuiInset()[0].Y,
+	const mouseScreenPosition = UserInputService.GetMouseLocation();
+	const ray = camera?.ViewportPointToRay(
+		mouseScreenPosition.X,
+		mouseScreenPosition.Y,
 	) as Ray;
 
-	return Ray;
+	return ray;
 };
 
-export const RaycastFromMouse = (Params: RaycastParams): RaycastResult | undefined => {
-	const Ray = GetScreenPointRay();
+export const raycastFromMouse = (params: RaycastParams): RaycastResult | undefined => {
+	const ray = GetScreenPointRay();
 
-	const Raycast = Workspace.Raycast(Ray?.Origin, Ray.Direction.mul(100), Params);
-	if (Raycast && Raycast.Instance) return Raycast;
+	const raycast = Workspace.Raycast(ray?.Origin, ray.Direction.mul(100), params);
+	if (raycast && raycast.Instance) return raycast;
 	else return undefined;
 };
 
-export const TogglePlacedTowersHitbox = (Toggle: boolean): void => {
-	PlacedTowersFolder.GetChildren().forEach((TowerModel) => {
+export const togglePlacedTowersHitbox = (Toggle: boolean): void => {
+	placedTowersFolder.GetChildren().forEach((TowerModel) => {
 		const Hitbox = TowerModel.FindFirstChild("RedArea") as BasePart | undefined;
 
 		if (Hitbox !== undefined) Hitbox.Transparency = Toggle ? 0.5 : 1;

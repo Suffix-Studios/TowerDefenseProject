@@ -1,43 +1,45 @@
-import ClientTypes from "Client/Modules/ClientTypes";
+import { Atom } from "@rbxts/charm";
 import ClientData from "Client/Modules/Data";
 import InputManager from "Client/Modules/InputManager";
-import Enumerators from "Shared/CoreLibs/Enumerators";
+import { Client, Shared } from "Shared/Types";
 import Placement from "./Placement";
 
-const HandleAction = (InputAction: ClientTypes.InputAction): void => {
-	const SplittedActionName = InputAction.Action.split(" ");
-	if (SplittedActionName[0] === "Slot") {
-		const PlayerLoadout = ClientData.Data["Loadout" as keyof typeof ClientData.Data] as Map<string, string>;
-		const PlayerTowersInventory = ClientData.Data["TowersInventory" as keyof typeof ClientData.Data] as Map<
-			string,
-			object
+const handleAction = (InputAction: Client.InputAction): void => {
+	const slotNum = tonumber(InputAction.Action);
+
+	if (slotNum !== undefined) {
+		const playerLoadout = ClientData.data.get("Loadout") as Atom<Shared.PlayerData["Loadout"]>;
+		const playerTowersInventory = ClientData.data.get("TowersInventory") as Atom<
+			Shared.PlayerData["TowersInventory"]
 		>;
 
-		if (PlayerLoadout.get(InputAction.Action) !== "") {
-			const Tower = PlayerTowersInventory.get(PlayerLoadout.get(InputAction.Action) as string) as {
+		if ((playerLoadout() as string[])[slotNum] !== "") {
+			const tower = (playerTowersInventory() as Shared.PlayerData["TowersInventory"])?.get(
+				(playerLoadout() as string[])[slotNum] as string,
+			) as {
 				Name: string;
 			};
 
-			if (Placement.CurrentSlot === undefined) {
-				Placement.Start(Tower.Name);
-				Placement.CurrentSlot = InputAction.Action as keyof typeof Enumerators.Slot;
-			} else if (Placement.CurrentSlot === InputAction.Action) {
+			if (Placement.currentSlot === undefined) {
+				Placement.Start(tower.Name);
+				Placement.currentSlot = slotNum;
+			} else if (Placement.currentSlot === slotNum) {
 				Placement.Stop();
 			} else {
 				Placement.Stop();
-				Placement.Start(Tower.Name);
+				Placement.Start(tower.Name);
 
-				Placement.CurrentSlot = InputAction.Action as keyof typeof Enumerators.Slot;
+				Placement.currentSlot = slotNum;
 			}
 		}
 	}
 };
 
-const OnClick = (InputAction: ClientTypes.InputAction): void => {
+const onClick = (): void => {
 	if (!Placement.isPlacing) return;
 
 	Placement.Place();
 };
 
-InputManager.ListenToAction("Click").Connect((InputAction) => OnClick(InputAction));
-InputManager.ActionBegan.Connect((InputAction) => HandleAction(InputAction));
+InputManager.listenToAction("Click").Connect(() => onClick());
+InputManager.actionBegan.Connect((InputAction) => handleAction(InputAction));

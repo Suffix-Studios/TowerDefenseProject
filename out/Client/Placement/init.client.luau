@@ -3,38 +3,40 @@ local TS = require(game:GetService("ReplicatedStorage"):WaitForChild("rbxts_incl
 local ClientData = TS.import(script, game:GetService("ReplicatedStorage"), "Client", "Modules", "Data")
 local InputManager = TS.import(script, game:GetService("ReplicatedStorage"), "Client", "Modules", "InputManager")
 local Placement = TS.import(script, game:GetService("ReplicatedStorage"), "Client", "Placement", "Placement")
-local HandleAction = function(InputAction)
-	local SplittedActionName = string.split(InputAction.Action, " ")
-	if SplittedActionName[1] == "Slot" then
-		local PlayerLoadout = ClientData.Data.Loadout
-		local PlayerTowersInventory = ClientData.Data.TowersInventory
-		local _action = InputAction.Action
-		if PlayerLoadout[_action] ~= "" then
-			local _action_1 = InputAction.Action
-			local _arg0 = PlayerLoadout[_action_1]
-			local Tower = PlayerTowersInventory[_arg0]
-			if Placement.CurrentSlot == nil then
-				Placement.Start(Tower.Name)
-				Placement.CurrentSlot = InputAction.Action
-			elseif Placement.CurrentSlot == InputAction.Action then
+local handleAction = function(InputAction)
+	local slotNum = tonumber(InputAction.Action)
+	if slotNum ~= nil then
+		local playerLoadout = ClientData.data.Loadout
+		local playerTowersInventory = ClientData.data.TowersInventory
+		if (playerLoadout())[slotNum + 1] ~= "" then
+			local _result = (playerTowersInventory())
+			if _result ~= nil then
+				local _arg0 = (playerLoadout())[slotNum + 1]
+				_result = _result[_arg0]
+			end
+			local tower = _result
+			if Placement.currentSlot == nil then
+				Placement.Start(tower.Name)
+				Placement.currentSlot = slotNum
+			elseif Placement.currentSlot == slotNum then
 				Placement.Stop()
 			else
 				Placement.Stop()
-				Placement.Start(Tower.Name)
-				Placement.CurrentSlot = InputAction.Action
+				Placement.Start(tower.Name)
+				Placement.currentSlot = slotNum
 			end
 		end
 	end
 end
-local OnClick = function(InputAction)
+local onClick = function()
 	if not Placement.isPlacing then
 		return nil
 	end
 	Placement.Place()
 end
-InputManager.ListenToAction("Click"):Connect(function(InputAction)
-	return OnClick(InputAction)
+InputManager.listenToAction("Click"):Connect(function()
+	return onClick()
 end)
-InputManager.ActionBegan:Connect(function(InputAction)
-	return HandleAction(InputAction)
+InputManager.actionBegan:Connect(function(InputAction)
+	return handleAction(InputAction)
 end)

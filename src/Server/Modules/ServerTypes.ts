@@ -1,3 +1,0 @@
-namespace ServerTypes {}
-
-export = ServerTypes;

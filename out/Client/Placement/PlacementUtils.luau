@@ -1,35 +1,34 @@
 -- Compiled with roblox-ts v3.0.0
 local TS = require(game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("RuntimeLib"))
 local _services = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "services")
-local GuiService = _services.GuiService
 local UserInputService = _services.UserInputService
 local Workspace = _services.Workspace
-local PlacedTowersFolder = Workspace:WaitForChild("PlacedTowers")
-local Camera = Workspace.CurrentCamera
+local placedTowersFolder = Workspace:WaitForChild("PlacedTowers")
+local camera = Workspace.CurrentCamera
 local GetScreenPointRay = function()
-	local MouseScreenPosition = UserInputService:GetMouseLocation()
-	local _result = Camera
+	local mouseScreenPosition = UserInputService:GetMouseLocation()
+	local _result = camera
 	if _result ~= nil then
-		_result = _result:ScreenPointToRay(MouseScreenPosition.X, MouseScreenPosition.Y - (GuiService:GetGuiInset()).Y)
+		_result = _result:ViewportPointToRay(mouseScreenPosition.X, mouseScreenPosition.Y)
 	end
-	local Ray = _result
-	return Ray
+	local ray = _result
+	return ray
 end
-local RaycastFromMouse = function(Params)
-	local Ray = GetScreenPointRay()
-	local _result = Ray
+local raycastFromMouse = function(params)
+	local ray = GetScreenPointRay()
+	local _result = ray
 	if _result ~= nil then
 		_result = _result.Origin
 	end
-	local Raycast = Workspace:Raycast(_result, Ray.Direction * 100, Params)
-	if Raycast and Raycast.Instance then
-		return Raycast
+	local raycast = Workspace:Raycast(_result, ray.Direction * 100, params)
+	if raycast and raycast.Instance then
+		return raycast
 	else
 		return nil
 	end
 end
-local TogglePlacedTowersHitbox = function(Toggle)
-	local _exp = PlacedTowersFolder:GetChildren()
+local togglePlacedTowersHitbox = function(Toggle)
+	local _exp = placedTowersFolder:GetChildren()
 	-- ▼ ReadonlyArray.forEach ▼
 	local _callback = function(TowerModel)
 		local Hitbox = TowerModel:FindFirstChild("RedArea")
@@ -44,6 +43,6 @@ local TogglePlacedTowersHitbox = function(Toggle)
 end
 return {
 	GetScreenPointRay = GetScreenPointRay,
-	RaycastFromMouse = RaycastFromMouse,
-	TogglePlacedTowersHitbox = TogglePlacedTowersHitbox,
+	raycastFromMouse = raycastFromMouse,
+	togglePlacedTowersHitbox = togglePlacedTowersHitbox,
 }

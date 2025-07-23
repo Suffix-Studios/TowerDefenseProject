@@ -6,13 +6,12 @@ local Players = _services.Players
 local ReplicatedStorage = _services.ReplicatedStorage
 local RunService = _services.RunService
 local Workspace = _services.Workspace
-local ClientEvents = TS.import(script, game:GetService("ReplicatedStorage"), "Client", "Modules", "ClientNetworking").ClientEvents
-local TowerRange = TS.import(script, game:GetService("ReplicatedStorage"), "Client", "UI", "TowerRanges")
+local Tower = TS.import(script, game:GetService("ReplicatedStorage"), "Client", "Modules", "Network", "Entities").Tower
 local TowersInfo = TS.import(script, game:GetService("ReplicatedStorage"), "Modules", "TowersInfo")
 local _PlacementUtils = TS.import(script, game:GetService("ReplicatedStorage"), "Client", "Placement", "PlacementUtils")
 local GetScreenPointRay = _PlacementUtils.GetScreenPointRay
-local RaycastFromMouse = _PlacementUtils.RaycastFromMouse
-local TogglePlacedTowersHitbox = _PlacementUtils.TogglePlacedTowersHitbox
+local raycastFromMouse = _PlacementUtils.raycastFromMouse
+local togglePlacedTowersHitbox = _PlacementUtils.togglePlacedTowersHitbox
 local Player = Players.LocalPlayer
 local Camera = Workspace.CurrentCamera
 local ValidPlacementRangeColor = "6acbff"
@@ -24,32 +23,31 @@ do
 	local _container = Placement
 	local _hollow
 	local _placementConnection
-	local _rangeDisplay
-	local GetMouseRayParams = function(ignoreModel)
-		local MouseRayParams = RaycastParams.new()
-		MouseRayParams.FilterType = Enum.RaycastFilterType.Exclude
-		MouseRayParams.FilterDescendantsInstances = { Workspace:FindFirstChild("Enemies"), Player.Character, ignoreModel }
-		return MouseRayParams
+	local getMouseRayParams = function(ignoreModel)
+		local mouseRayParams = RaycastParams.new()
+		mouseRayParams.FilterType = Enum.RaycastFilterType.Exclude
+		mouseRayParams.FilterDescendantsInstances = { Workspace:FindFirstChild("Enemies"), Player.Character, ignoreModel }
+		return mouseRayParams
 	end
-	local GetPlacementModel = function(ModelName)
-		local TowerModel = TowersModels:FindFirstChild(ModelName)
-		if TowerModel then
-			TowerModel = TowerModel:Clone()
-			for _, Descendant in pairs(TowerModel:GetDescendants()) do
-				if Descendant:IsA("BasePart") and not Descendant:HasTag("RedArea") then
-					Descendant.Material = Enum.Material.ForceField
-					Descendant.Transparency = 0.4
+	local getPlacementModel = function(modelName)
+		local towerModel = TowersModels:FindFirstChild(modelName)
+		if towerModel then
+			towerModel = towerModel:Clone()
+			for _, descendant in pairs(towerModel:GetDescendants()) do
+				if descendant:IsA("BasePart") and not descendant:HasTag("RedArea") then
+					descendant.Material = Enum.Material.ForceField
+					descendant.Transparency = 0.4
 				end
 			end
-			TowerModel.Parent = Workspace
-			local RayResult = RaycastFromMouse(GetMouseRayParams(TowerModel))
-			local _towerModel = TowerModel
-			local _result = RayResult
+			towerModel.Parent = Workspace
+			local rayResult = raycastFromMouse(getMouseRayParams(towerModel))
+			local _towerModel = towerModel
+			local _result = rayResult
 			if _result ~= nil then
 				_result = _result.Position
 			end
 			_towerModel:PivotTo(CFrame.new(_result))
-			return TowerModel
+			return towerModel
 		end
 		return nil
 	end
@@ -60,39 +58,24 @@ do
 			return nil
 		end
 		print("Started Placing")
-		_hollow = GetPlacementModel(TowerName)
-		_rangeDisplay = TowerRange.new({
-			Parent = _hollow,
-			RangeColor = Color3.fromHex(ValidPlacementRangeColor),
-			RangeSize = TowerInfo.Range,
-			TowerId = -100,
-		})
+		_hollow = getPlacementModel(TowerName)
+		--/ Create Tower Range
 		_container.isPlacing = true
-		TogglePlacedTowersHitbox(true)
+		togglePlacedTowersHitbox(true)
 		_placementConnection = RunService.RenderStepped:Connect(function()
-			local RayResult = RaycastFromMouse(GetMouseRayParams(_hollow))
+			local RayResult = raycastFromMouse(getMouseRayParams(_hollow))
 			if RayResult then
-				local RayCFrame = CFrame.new(RayResult.Position)
+				local rayCFrame = CFrame.new(RayResult.Position)
 				local _result = _hollow
 				if _result ~= nil then
-					_result = _result:GetPivot():Lerp(RayCFrame, 0.15)
+					_result = _result:GetPivot():Lerp(rayCFrame, 0.15)
 				end
 				local newCFrame = _result
 				local _result_1 = _hollow
 				if _result_1 ~= nil then
 					_result_1:PivotTo(newCFrame)
 				end
-				if RayResult.Instance:HasTag(TowerInfo.Type) then
-					local _result_2 = _rangeDisplay
-					if _result_2 ~= nil then
-						_result_2.Color(Color3.fromHex(ValidPlacementRangeColor))
-					end
-				else
-					local _result_2 = _rangeDisplay
-					if _result_2 ~= nil then
-						_result_2.Color(Color3.fromHex(InvalidPlacementRangeColor))
-					end
-				end
+				--/ Adjust Tower Range Color
 			end
 		end)
 	end
@@ -102,31 +85,26 @@ do
 			return nil
 		end
 		print("Stopped Placing")
-		TogglePlacedTowersHitbox(false)
+		togglePlacedTowersHitbox(false)
 		_placementConnection:Disconnect()
 		Placement.isPlacing = false
-		Placement.CurrentSlot = nil
+		Placement.currentSlot = nil
 		local _result = _hollow
 		if _result ~= nil then
 			_result:Destroy()
 		end
 		_hollow = nil
-		local _result_1 = _rangeDisplay
-		if _result_1 ~= nil then
-			_result_1:Destroy()
-		end
-		_rangeDisplay = nil
+		--/ Destroy Tower Range
 	end
 	_container.Stop = Stop
 	local Place = function()
-		local _TargetCFrame = _hollow
-		if _TargetCFrame ~= nil then
-			_TargetCFrame = _TargetCFrame:GetPivot()
-		end
-		local TargetCFrame = _TargetCFrame
-		if Placement.CurrentSlot ~= nil then
+		if Placement.currentSlot ~= nil then
 			local Ray = GetScreenPointRay()
-			ClientEvents.PlaceTower:fire(Ray.Origin, Ray.Direction, Placement.CurrentSlot)
+			Tower.placeTower.fire({
+				Origin = Ray.Origin,
+				Direction = Ray.Direction,
+				Slot = Placement.currentSlot,
+			})
 			Placement.Stop()
 		end
 	end

@@ -1,61 +1,53 @@
 import Signal from "@rbxts/lemon-signal";
 import { UserInputService } from "@rbxts/services";
-import { InputAction } from "../ClientTypes";
+import { Client } from "Shared/Types";
 import Actions from "./Actions";
 
 namespace InputManager {
-	export const ActionBegan = new Signal<InputAction>();
-	export const ActionEnded = new Signal<InputAction>();
-	const _actionsSignals = new Map<string, Signal<InputAction>>();
+	export const actionBegan = new Signal<Client.InputAction>();
+	export const actionEnded = new Signal<Client.InputAction>();
+	const _actionsSignals = new Map<string, Signal<Client.InputAction>>();
 
-	export const InvokeAction = (
+	export const invokeAction = (
 		ActionName: string,
 		State: Enum.UserInputState,
 		Key: Enum.KeyCode | Enum.UserInputType | undefined,
 	): void => {
 		assert(Actions.has(ActionName), `Invalid Action Name, Not Valid Action With Name ${ActionName}`);
 
-		const ActionInfo: InputAction = {
+		const actionInfo: Client.InputAction = {
 			Action: ActionName,
 			State: State,
 			Key: Key === undefined ? (Key as unknown as Enum.KeyCode) : Enum.KeyCode.Unknown,
 		};
 
-		if (State === Enum.UserInputState.Begin) ActionBegan.Fire(ActionInfo);
-		else ActionEnded.Fire(ActionInfo);
+		if (State === Enum.UserInputState.Begin) actionBegan.Fire(actionInfo);
+		else actionEnded.Fire(actionInfo);
 
 		if (_actionsSignals.has(ActionName)) {
-			_actionsSignals.get(ActionName)?.Fire(ActionInfo);
+			_actionsSignals.get(ActionName)?.Fire(actionInfo);
 		}
 	};
 
-	export const BindActionToButton = (Button: GuiButton, ActionName: string): void => {
-		if (!Button) return;
+	export const listenToAction = (actionName: string): Signal<Client.InputAction> => {
+		assert(Actions.has(actionName), `Invalid Action Name, Not Valid Action With Name ${actionName}`);
 
-		Button.Activated.Connect(() => {
-			InvokeAction(ActionName, Enum.UserInputState.Begin, undefined);
-		});
-	};
+		let actionSignal: Signal<Client.InputAction>;
 
-	export const ListenToAction = (ActionName: string): Signal<InputAction> => {
-		assert(Actions.has(ActionName), `Invalid Action Name, Not Valid Action With Name ${ActionName}`);
-
-		let ActionSignal: Signal<InputAction>;
-
-		if (_actionsSignals.has(ActionName)) {
-			ActionSignal = _actionsSignals.get(ActionName) as Signal<InputAction>;
+		if (_actionsSignals.has(actionName)) {
+			actionSignal = _actionsSignals.get(actionName) as Signal<Client.InputAction>;
 		} else {
-			ActionSignal = new Signal<InputAction>();
-			_actionsSignals.set(ActionName, ActionSignal);
+			actionSignal = new Signal<Client.InputAction>();
+			_actionsSignals.set(actionName, actionSignal);
 		}
 
-		return ActionSignal;
+		return actionSignal;
 	};
 
-	export const IsActionHeld = (ActionName: string & keyof typeof Actions): boolean => {
-		assert(Actions.has(ActionName), "Invalid Action Name!");
+	export const isActionHeld = (actionName: string & keyof typeof Actions): boolean => {
+		assert(Actions.has(actionName), "Invalid Action Name!");
 
-		Actions.get(ActionName)?.forEach((Key) => {
+		Actions.get(actionName)?.forEach((Key) => {
 			if (UserInputService.IsKeyDown(Key as Enum.KeyCode)) return true;
 		});
 

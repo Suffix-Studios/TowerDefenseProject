@@ -1,0 +1,36 @@
+option ClientOutput = "../src/Shared/Types.ts"
+option ServerOutput = "../src/Shared/Types.ts"
+
+option Typescript = true
+
+scope Shared {
+	enum EnemyType = { Normal, Speedy, Tanky, MiniBoss, Boss }
+	struct InventoryTower {
+		Exp: u32,
+		Name: string,
+		Level: u16,
+	}
+
+	struct PlayerData {
+		Gold: u32?,
+		Silver: u32?,
+
+		Level: u16?,
+		Exp: u32?,
+
+		MaxTowers: u16?,
+
+		TowersInventory: map {[string]: InventoryTower}?,
+		Loadout: string[1..6]?,
+	}
+}
+
+scope Client {
+	struct InputAction {
+		Action: string,
+		State: unknown,
+		Key: unknown,
+	}
+}
+
+scope Server {}
