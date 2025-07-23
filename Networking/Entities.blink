@@ -1,0 +1,54 @@
+option ClientOutput = "../src/Client/Modules/Network/Entities.ts"
+option ServerOutput = "../src/Server/Modules/Network/Entities.ts"
+
+option Typescript = true
+option Casing = Camel
+
+import "./Common"
+
+event entityRemoved {
+	From: Server,
+	Type: Reliable,
+	Call: SingleAsync,
+	Data: u16
+}
+
+scope Enemy {
+	event enemyAdded {
+		From: Server,
+		Type: Reliable,
+		Call: SingleAsync,
+		Data: struct {
+			ModelName: string,
+			Type: Common.Shared.EnemyType,
+			Air: boolean,
+			Speed: u8,
+			MaxHealth: u32,
+			T: i16
+		}
+	}
+}
+
+scope Tower {
+	event towerAdded {
+		From: Server,
+		Type: Reliable,
+		Call: SingleAsync,
+		Data: struct {
+			TowerName: string,
+			Owner: f64,
+			Position: vector<f16>,
+		}
+	}
+
+	event placeTower {
+		From: Client,
+		Type: Reliable,
+		Call: SingleAsync,
+		Data: struct {
+			Origin: vector<f16>,
+			Direction: vector<f16>,
+			Slot: u8(1..6)
+		}
+	}
+}

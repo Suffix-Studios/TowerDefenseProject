@@ -2,60 +2,40 @@
 local TS = require(game:GetService("ReplicatedStorage"):WaitForChild("rbxts_include"):WaitForChild("RuntimeLib"))
 --/ Services
 local _services = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "services")
-local RunService = _services.RunService
-local Players = _services.Players
 local HttpService = _services.HttpService
+local Players = _services.Players
+local RunService = _services.RunService
 --/ Packages
 local ProfileService = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "profileservice", "src")
+local PlayerDataTemplate = TS.import(script, game:GetService("ReplicatedStorage"), "Modules", "Constants").PlayerDataTemplate
 local TowersInfo = TS.import(script, game:GetService("ReplicatedStorage"), "Modules", "TowersInfo")
-local _ServerNetworking = TS.import(script, game:GetService("ServerScriptService"), "Modules", "ServerNetworking")
-local ServerEvents = _ServerNetworking.ServerEvents
-local ServerFunctions = _ServerNetworking.ServerFunctions
-local DataTemplate = {
-	Gold = 0,
-	Silver = 100,
-	Level = 1,
-	Exp = 0,
-	MaxTowers = 60,
-	TowersInventory = {},
-	Loadout = {
-		["Slot 1"] = "",
-		["Slot 2"] = "",
-		["Slot 3"] = "",
-		["Slot 4"] = "",
-		["Slot 5"] = "",
-		["Slot 6"] = "",
-	},
-}
+local requestData = TS.import(script, game:GetService("ServerScriptService"), "Modules", "Network", "PlayerData").requestData
 local StartingTowers = { "TestTower_Single", "TestTower_Cone", "TestTower_Circle", "TestTower_Full" }
-local ProfileStore = if RunService:IsStudio() then ProfileService.GetProfileStore("Players_Data_xxx0", DataTemplate).Mock else ProfileService.GetProfileStore("Players_Data_xxx0", DataTemplate)
+local ProfileStore = if RunService:IsStudio() then ProfileService.GetProfileStore("Players_Data_xxx0", PlayerDataTemplate).Mock else ProfileService.GetProfileStore("Players_Data_xxx0", PlayerDataTemplate)
 local Profiles = {}
 local GetUniqueTowerId = function(Player, TowerName)
 	return `{TowerName}-{Player.UserId}_{HttpService:GenerateGUID(false)}`
 end
-local ReplicateData = function(Player, Data)
-	ServerEvents.ReplicateData:fire(Player, Data)
-end
-ServerFunctions.RequestData:setCallback(function(Player)
-	local _profiles = Profiles
+-- const ReplicateData = (Player: Player, Data: Shared.PlayerData): void => {
+-- 	ServerEvents.ReplicateData.fire(Player, Data);
+-- };
+-- eslint-disable-next-line @typescript-eslint/no-explicit-any
+requestData.on(function(Player)
 	local _player = Player
-	if not (_profiles[_player] ~= nil) then
+	if not (Profiles[_player] ~= nil) then
 		for i = 1, 9 do
 			task.wait(1)
-			local _profiles_1 = Profiles
 			local _player_1 = Player
-			if _profiles_1[_player_1] ~= nil then
+			if Profiles[_player_1] ~= nil then
 				break
 			end
 		end
-		local _profiles_1 = Profiles
 		local _player_1 = Player
-		if not (_profiles_1[_player_1] ~= nil) then
+		if not (Profiles[_player_1] ~= nil) then
 			Player:Kick("Player Data Couldn't Be Loaded.")
 		end
-		local _profiles_2 = Profiles
 		local _player_2 = Player
-		local _result = _profiles_2[_player_2]
+		local _result = Profiles[_player_2]
 		if _result ~= nil then
 			_result = _result.Data
 		end
@@ -72,15 +52,13 @@ do
 			PlayerProfile:AddUserId(Player.UserId)
 			PlayerProfile:Reconcile()
 			PlayerProfile:ListenToRelease(function()
-				local _profiles = Profiles
 				local _player = Player
-				_profiles[_player] = nil
+				Profiles[_player] = nil
 				Player:Kick("Player Profile Released! Rejoin If This Is An Error.")
 			end)
 			if Player:IsDescendantOf(Players) then
-				local _profiles = Profiles
 				local _player = Player
-				_profiles[_player] = PlayerProfile
+				Profiles[_player] = PlayerProfile
 				-- ▼ ReadonlyMap.size ▼
 				local _size = 0
 				for _ in PlayerProfile.Data.TowersInventory do
@@ -90,10 +68,8 @@ do
 				if _size == 0 then
 					for i = 0, #StartingTowers - 1 do
 						local newTower = DataService.GiveTower(Player, StartingTowers[i + 1])
-						if newTower ~= "" and newTower then
-							local _loadout = PlayerProfile.Data.Loadout
-							local _arg0 = `Slot {i + 1}`
-							_loadout[_arg0] = newTower
+						if newTower ~= nil then
+							PlayerProfile.Data.Loadout[i + 2] = newTower
 						end
 					end
 				end
@@ -104,18 +80,16 @@ do
 	end
 	_container.LoadProfile = LoadProfile
 	local UnloadProfile = function(Player)
-		local _profiles = Profiles
 		local _player = Player
-		local PlayerProfile = _profiles[_player]
+		local PlayerProfile = Profiles[_player]
 		if PlayerProfile then
 			PlayerProfile:Release()
 		end
 	end
 	_container.UnloadProfile = UnloadProfile
 	local GiveTower = function(Player, TowerName)
-		local _profiles = Profiles
 		local _player = Player
-		local PlayerProfile = _profiles[_player]
+		local PlayerProfile = Profiles[_player]
 		local _towerName = TowerName
 		local Info = TowersInfo[_towerName]
 		if Info and PlayerProfile then
@@ -125,18 +99,18 @@ do
 				Level = 1,
 			}
 			local TowerId = GetUniqueTowerId(Player, TowerName)
-			local _towersInventory = PlayerProfile.Data.TowersInventory
-			local _newTower = newTower
-			_towersInventory[TowerId] = _newTower
+			local _result = PlayerProfile.Data.TowersInventory
+			if _result ~= nil then
+				_result[TowerId] = newTower
+			end
 			return TowerId
 		end
 		return nil
 	end
 	_container.GiveTower = GiveTower
 	local GetData = function(Player)
-		local _profiles = Profiles
 		local _player = Player
-		local PlayerProfile = _profiles[_player]
+		local PlayerProfile = Profiles[_player]
 		if PlayerProfile then
 			return PlayerProfile.Data
 		else
@@ -144,10 +118,10 @@ do
 		end
 	end
 	_container.GetData = GetData
+	-- eslint-disable-next-line @typescript-eslint/no-explicit-any
 	local SetData = function(Player, DataName, newValue)
-		local _profiles = Profiles
 		local _player = Player
-		local PlayerProfile = _profiles[_player]
+		local PlayerProfile = Profiles[_player]
 		if PlayerProfile then
 			print(PlayerProfile.Data)
 			local _arg0 = PlayerProfile.Data[DataName] ~= nil
@@ -159,7 +133,7 @@ do
 			local _arg0_1 = typeof(_exp) == _arg1_1
 			assert(_arg0_1, "Invalid Argument #3")
 			PlayerProfile.Data[DataName] = newValue
-			ReplicateData(Player, PlayerProfile.Data)
+			-- ReplicateData(Player, PlayerProfile.Data);
 		end
 	end
 	_container.SetData = SetData

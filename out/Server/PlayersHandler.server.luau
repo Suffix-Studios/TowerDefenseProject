@@ -3,8 +3,8 @@ local TS = require(game:GetService("ReplicatedStorage"):WaitForChild("rbxts_incl
 local Players = TS.import(script, game:GetService("ReplicatedStorage"), "rbxts_include", "node_modules", "@rbxts", "services").Players
 local DataService = TS.import(script, game:GetService("ServerScriptService"), "Modules", "DataService")
 Players.PlayerAdded:Connect(function(Player)
-	Player.CharacterAdded:Connect(function(Character)
-		for _, Descendant in pairs(Character:GetDescendants()) do
+	Player.CharacterAdded:Connect(function(character)
+		for _, Descendant in pairs(character:GetDescendants()) do
 			if Descendant:IsA("BasePart") then
 				Descendant.CollisionGroup = "Players"
 			end

@@ -1,9 +1,8 @@
+/* eslint-disable roblox-ts/no-array-pairs */
 import { Players, ReplicatedStorage, RunService, Workspace } from "@rbxts/services";
-import { RaycastFromMouse, TogglePlacedTowersHitbox } from "./PlacementUtils";
+import { Tower } from "Client/Modules/Network/Entities";
 import TowersInfo from "Shared/TowersInfo";
-import TowerRangeDisplay from "Client/Modules/Entities/ClientTower/RangeDisplay";
-import Enumerators from "Shared/CoreLibs/Enumerators";
-import { ClientEvents } from "Client/Modules/ClientNetworking";
+import { GetScreenPointRay, raycastFromMouse, togglePlacedTowersHitbox } from "./PlacementUtils";
 
 const Player = Players.LocalPlayer;
 const Camera = Workspace.CurrentCamera as Camera;
@@ -11,108 +10,100 @@ const Camera = Workspace.CurrentCamera as Camera;
 const ValidPlacementRangeColor = "6acbff";
 const InvalidPlacementRangeColor = "ff0000";
 
-const TowersModels = ReplicatedStorage.FindFirstChild("TowersModels") as Folder
+const TowersModels = ReplicatedStorage.FindFirstChild("TowersModels") as Folder;
 
 namespace Placement {
-    let _hollow: Model | undefined;
-    let _placementConnection: RBXScriptConnection;
-    let _rangeDisplay: TowerRangeDisplay | undefined;
+	let _hollow: Model | undefined;
+	let _placementConnection: RBXScriptConnection;
 
-    export let CurrentSlot: keyof typeof Enumerators.Slot | undefined;
-    export let isPlacing: Boolean;
+	export let currentSlot: number | undefined;
+	export let isPlacing: boolean;
 
-    const GetMouseRayParams = (ignoreModel: Model): RaycastParams => {
-        let Character = Player.Character;
+	const getMouseRayParams = (ignoreModel: Model): RaycastParams => {
+		const mouseRayParams = new RaycastParams();
+		mouseRayParams.FilterType = Enum.RaycastFilterType.Exclude;
+		mouseRayParams.FilterDescendantsInstances = [
+			Workspace.FindFirstChild("Enemies") as Folder,
+			Player.Character as Model,
+			ignoreModel,
+		];
 
-        const MouseRayParams = new RaycastParams();
-        MouseRayParams.FilterType = Enum.RaycastFilterType.Exclude;
-        MouseRayParams.FilterDescendantsInstances = [Character as Model, ignoreModel];
+		return mouseRayParams;
+	};
 
-        return MouseRayParams;
-    }
+	const getPlacementModel = (modelName: string): Model | undefined => {
+		let towerModel = TowersModels.FindFirstChild(modelName) as Model;
 
-    const GetPlacementModel = (ModelName: string): Model | undefined => {
-        let TowerModel = TowersModels.FindFirstChild(ModelName) as Model;
+		if (towerModel) {
+			towerModel = towerModel.Clone();
 
-        if (TowerModel) {
-            TowerModel = TowerModel.Clone();
+			for (const [_, descendant] of pairs(towerModel.GetDescendants())) {
+				if (descendant.IsA("BasePart") && !descendant.HasTag("RedArea")) {
+					descendant.Material = Enum.Material.ForceField;
+					descendant.Transparency = 0.4;
+				}
+			}
 
-            for(const [_, Descendant] of pairs(TowerModel.GetDescendants())) {
-                if (Descendant.IsA("BasePart") && !Descendant.HasTag("RedArea")) {
-                    Descendant.Material = Enum.Material.ForceField;
-                    Descendant.Transparency = 0.4;
-                }
-            }
+			towerModel.Parent = Workspace;
+			const rayResult = raycastFromMouse(getMouseRayParams(towerModel));
 
-            TowerModel.Parent = Workspace;
-            const RayResult = RaycastFromMouse(GetMouseRayParams(TowerModel));
+			towerModel.PivotTo(new CFrame(rayResult?.Position as Vector3));
 
-            TowerModel.PivotTo(new CFrame(RayResult?.Position as Vector3));
+			return towerModel;
+		}
 
-            return TowerModel
-        }
+		return undefined;
+	};
 
+	export const Start = (TowerName: string): void => {
+		const TowerInfo = TowersInfo.get(TowerName);
+		if (!TowerInfo) return;
 
-        return undefined;
-    }
+		print("Started Placing");
 
-    export const Start = (TowerName: string): void => {
-        const TowerInfo = TowersInfo.get(TowerName);
-        if (!TowerInfo) return;
+		_hollow = getPlacementModel(TowerName);
+		/// Create Tower Range
 
-        print("Started Placing");
+		isPlacing = true;
+		togglePlacedTowersHitbox(true);
 
-        _hollow = GetPlacementModel(TowerName);
-        _rangeDisplay = new TowerRangeDisplay(_hollow?.GetPivot().Position as Vector3, Color3.fromHex(ValidPlacementRangeColor), TowerInfo.Range as number);
+		_placementConnection = RunService.RenderStepped.Connect(() => {
+			const RayResult = raycastFromMouse(getMouseRayParams(_hollow as Model));
 
-        isPlacing = true;
-        TogglePlacedTowersHitbox(true);
+			if (RayResult) {
+				const rayCFrame = new CFrame(RayResult.Position);
+				const newCFrame = _hollow?.GetPivot().Lerp(rayCFrame, 0.15) as CFrame;
 
-        _placementConnection = RunService.RenderStepped.Connect(() => {
-            const RayResult = RaycastFromMouse(GetMouseRayParams(_hollow as Model));
+				_hollow?.PivotTo(newCFrame);
+				/// Adjust Tower Range Color
+			}
+		});
+	};
 
-            if (RayResult) {
-                const RayCFrame = new CFrame(RayResult.Position);
-                const newCFrame = _hollow?.GetPivot().Lerp(RayCFrame, 0.15) as CFrame;
+	export const Stop = (): void => {
+		if (!Placement.isPlacing) return;
 
-                _hollow?.PivotTo(newCFrame);
-                _rangeDisplay?.SetPosition(newCFrame.Position);
+		print("Stopped Placing");
 
-                if(RayResult.Instance.HasTag(TowerInfo.Type)) {
-                    _rangeDisplay?.Color(Color3.fromHex(ValidPlacementRangeColor));
-                } else {
-                    _rangeDisplay?.Color(Color3.fromHex(InvalidPlacementRangeColor));
-                }
-            }
-        })
-    }
+		togglePlacedTowersHitbox(false);
 
-    export const Stop = (): void => {
-        if (!Placement.isPlacing) return;
+		_placementConnection.Disconnect();
+		Placement.isPlacing = false;
+		Placement.currentSlot = undefined;
 
-        print("Stopped Placing");
+		_hollow?.Destroy();
+		_hollow = undefined;
 
-        TogglePlacedTowersHitbox(false);
+		/// Destroy Tower Range
+	};
 
-        _placementConnection.Disconnect();
-        Placement.isPlacing = false
-        Placement.CurrentSlot = undefined;
-
-        _hollow?.Destroy();
-        _hollow = undefined;
-
-        _rangeDisplay?.Destroy();
-        _rangeDisplay = undefined;
-    }
-
-    export const Place = (): void => {
-        const TargetCFrame = _hollow?.GetPivot();
-
-        if (Placement.CurrentSlot !== undefined) {
-            ClientEvents.PlaceTower.fire(Camera.CFrame, TargetCFrame as CFrame, Placement.CurrentSlot);
-            Placement.Stop();
-        }
-    }
+	export const Place = (): void => {
+		if (Placement.currentSlot !== undefined) {
+			const Ray = GetScreenPointRay();
+			Tower.placeTower.fire({ Origin: Ray.Origin, Direction: Ray.Direction, Slot: Placement.currentSlot });
+			Placement.Stop();
+		}
+	};
 }
 
 export = Placement;

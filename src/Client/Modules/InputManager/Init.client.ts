@@ -2,17 +2,17 @@ import { UserInputService } from "@rbxts/services";
 import InputManager from ".";
 import Actions from "./Actions";
 
-const HandleInput = (Input: InputObject, gameProcessedEvent: boolean): void => {
-    if(gameProcessedEvent) return;
+const handleInput = (input: InputObject, gameProcessedEvent: boolean): void => {
+	if (gameProcessedEvent) return;
 
-    Actions.forEach((ActionBindings, ActionName) => {
-        if(ActionBindings.find((Binding) => Binding === Input.KeyCode || Binding === Input.UserInputType)) {
-            const Key = Input.KeyCode !== Enum.KeyCode.Unknown ? Input.KeyCode : Input.UserInputType;
+	Actions.forEach((actionBindings, actionName) => {
+		if (actionBindings.find((Binding) => Binding === input.KeyCode || Binding === input.UserInputType)) {
+			const Key = input.KeyCode !== Enum.KeyCode.Unknown ? input.KeyCode : input.UserInputType;
 
-            InputManager.InvokeAction(ActionName, Input.UserInputState, Key);
-        }
-    })
+			InputManager.invokeAction(actionName, input.UserInputState, Key);
+		}
+	});
 };
 
-UserInputService.InputBegan.Connect((Input, gameProcessedEvent) => HandleInput(Input, gameProcessedEvent));
-UserInputService.InputEnded.Connect((Input, gameProcessedEvent) => HandleInput(Input, gameProcessedEvent));
+UserInputService.InputBegan.Connect((input, gameProcessedEvent) => handleInput(input, gameProcessedEvent));
+UserInputService.InputEnded.Connect((input, gameProcessedEvent) => handleInput(input, gameProcessedEvent));
