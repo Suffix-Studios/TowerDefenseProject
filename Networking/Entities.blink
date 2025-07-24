@@ -1,8 +1,9 @@
-option ClientOutput = "../src/Client/Modules/Network/Entities.ts"
-option ServerOutput = "../src/Server/Modules/Network/Entities.ts"
+-- option ClientOutput = "../src/Client/Modules/Network/Entities.ts"
+-- option ServerOutput = "../src/Server/Modules/Network/Entities.ts"
 
-option Typescript = true
-option Casing = Camel
+-- option Typescript = true
+-- option Casing = Camel
+-- option SyncValidation = true
 
 import "./Common"
 

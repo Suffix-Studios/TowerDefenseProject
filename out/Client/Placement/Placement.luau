@@ -6,7 +6,7 @@ local Players = _services.Players
 local ReplicatedStorage = _services.ReplicatedStorage
 local RunService = _services.RunService
 local Workspace = _services.Workspace
-local Tower = TS.import(script, game:GetService("ReplicatedStorage"), "Client", "Modules", "Network", "Entities").Tower
+local Entities = TS.import(script, game:GetService("ReplicatedStorage"), "Client", "Modules", "Network").Entities
 local TowersInfo = TS.import(script, game:GetService("ReplicatedStorage"), "Modules", "TowersInfo")
 local _PlacementUtils = TS.import(script, game:GetService("ReplicatedStorage"), "Client", "Placement", "PlacementUtils")
 local GetScreenPointRay = _PlacementUtils.GetScreenPointRay
@@ -100,7 +100,7 @@ do
 	local Place = function()
 		if Placement.currentSlot ~= nil then
 			local Ray = GetScreenPointRay()
-			Tower.placeTower.fire({
+			Entities.Tower.placeTower.fire({
 				Origin = Ray.Origin,
 				Direction = Ray.Direction,
 				Slot = Placement.currentSlot,

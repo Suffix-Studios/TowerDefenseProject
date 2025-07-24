@@ -1,9 +1,9 @@
-option ClientOutput = "../src/Client/Modules/Network/PlayerData.ts"
-option ServerOutput = "../src/Server/Modules/Network/PlayerData.ts"
+-- option ClientOutput = "../src/Client/Modules/Network/PlayerData.ts"
+-- option ServerOutput = "../src/Server/Modules/Network/PlayerData.ts"
 
-option Typescript = true
-option PromiseLibrary = "ReplicatedStorage.rbxts_include.Promise"
-option Casing = Camel
+-- option Typescript = true
+-- option PromiseLibrary = "ReplicatedStorage.rbxts_include.Promise"
+-- option Casing = Camel
 
 import "./Common"
 
@@ -12,9 +12,4 @@ event replicateData {
 	Type: Reliable,
 	Call: SingleAsync,
 	Data: Common.Shared.PlayerData
-}
-
-function requestData {
-	Yield: Promise,
-	Return: Common.Shared.PlayerData
 }

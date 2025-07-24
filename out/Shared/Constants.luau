@@ -5,8 +5,19 @@ local PlayerDataTemplate = {
 	Level = 1,
 	Exp = 0,
 	MaxTowers = 60,
-	TowersInventory = {},
-	Loadout = { "", "", "", "", "", "" },
+	TowersInventory = {
+		T1 = {
+			Name = "TestTower_Single",
+			Level = 1,
+			Exp = 0,
+		},
+		T2 = {
+			Name = "TestTower_Full",
+			Level = 1,
+			Exp = 0,
+		},
+	},
+	Loadout = { "T1", "T2", "", "", "", "" },
 }
 return {
 	PlayerDataTemplate = PlayerDataTemplate,

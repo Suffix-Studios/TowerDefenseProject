@@ -1,6 +1,6 @@
 /* eslint-disable roblox-ts/no-array-pairs */
 import { Players, ReplicatedStorage, RunService, Workspace } from "@rbxts/services";
-import { Tower } from "Client/Modules/Network/Entities";
+import { Entities } from "Client/Modules/Network";
 import TowersInfo from "Shared/TowersInfo";
 import { GetScreenPointRay, raycastFromMouse, togglePlacedTowersHitbox } from "./PlacementUtils";
 
@@ -100,7 +100,11 @@ namespace Placement {
 	export const Place = (): void => {
 		if (Placement.currentSlot !== undefined) {
 			const Ray = GetScreenPointRay();
-			Tower.placeTower.fire({ Origin: Ray.Origin, Direction: Ray.Direction, Slot: Placement.currentSlot });
+			Entities.Tower.placeTower.fire({
+				Origin: Ray.Origin,
+				Direction: Ray.Direction,
+				Slot: Placement.currentSlot,
+			});
 			Placement.Stop();
 		}
 	};

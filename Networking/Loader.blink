@@ -1,0 +1,10 @@
+option ClientOutput = "../src/Client/Modules/Network.ts"
+option ServerOutput = "../src/Server/Modules/Network.ts"
+
+option Typescript = true
+option Casing = Camel
+option SyncValidation = true
+option PromiseLibrary = "ReplicatedStorage.rbxts_include.Promise"
+
+import "./Entities"
+import "./PlayerData"

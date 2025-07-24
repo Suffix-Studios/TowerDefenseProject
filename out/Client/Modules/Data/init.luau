@@ -20,15 +20,12 @@ do
 			_container.isReady = true
 			return nil
 		end
-		local _exp = _container.data
-		-- ▼ ReadonlyMap.forEach ▼
-		local _callback = function(DataAtom, DataName)
-			DataAtom(newData[DataName])
+		for dataKey, dataValue in pairs(newData) do
+			local _result = _container.data[dataKey]
+			if _result ~= nil then
+				_result(dataValue)
+			end
 		end
-		for _k, _v in _exp do
-			_callback(_v, _k, _exp)
-		end
-		-- ▲ ReadonlyMap.forEach ▲
 	end
 	_container.SetData = SetData
 end
