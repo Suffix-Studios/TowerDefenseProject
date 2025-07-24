@@ -3,7 +3,7 @@ import { Shared } from "Shared/Types";
 
 namespace ClientData {
 	export let isReady = false;
-	export let data: Map<keyof Shared.PlayerData, Atom<unknown>>;
+	export let data: Map<keyof Shared.PlayerData, Atom<Shared.PlayerData[keyof Shared.PlayerData]>>;
 
 	export const SetData = (newData: Shared.PlayerData): void => {
 		if (!newData) {
@@ -15,16 +15,16 @@ namespace ClientData {
 			data = {} as typeof data;
 
 			for (const [DataName, DataValue] of pairs(newData)) {
-				data.set(DataName, atom(DataValue as unknown));
+				data.set(DataName, atom(DataValue as Shared.PlayerData[keyof Shared.PlayerData]));
 			}
 
 			isReady = true;
 			return;
 		}
 
-		data.forEach((DataAtom, DataName) => {
-			DataAtom(newData[DataName]);
-		});
+		for (const [dataKey, dataValue] of pairs(newData)) {
+			data.get(dataKey as keyof Shared.PlayerData)?.(dataValue);
+		}
 	};
 }
 
